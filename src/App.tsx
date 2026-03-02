@@ -10,7 +10,7 @@ import FormLanguages from './components/FormLanguages';
 import AtsPreview from './components/AtsPreview';
 import DownloadButtons from './components/DownloadButtons';
 // Import or define the AtsResume type
-import type { AtsResume } from './types';
+// ...existing code...
 
 const TABS = [
   { key: 'basics', label: 'Basics' },
