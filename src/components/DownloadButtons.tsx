@@ -157,11 +157,11 @@ export default function DownloadButtons({ previewId = 'ats-preview', resume }: D
 
   if (exporting) return null;
   return (
-    <div className="flex gap-2 mt-2 no-print">
+    <div className="flex flex-col sm:flex-row gap-2 mt-2 no-print w-full sm:w-auto">
       <button 
         onClick={handlePDF} 
         disabled={disabled}
-        className="flex items-center gap-1 border border-gray-700 px-3 py-1.5 text-sm bg-white text-black hover:bg-gray-50 disabled:opacity-50"
+        className="flex items-center gap-1 border border-gray-700 px-3 py-1.5 text-sm bg-white text-black hover:bg-gray-50 disabled:opacity-50 w-full sm:w-auto"
         title={!isResumeComplete(resume) ? 'Completa todas las secciones para habilitar la descarga' : ''}
       >
         <Download size={14} />
@@ -170,7 +170,7 @@ export default function DownloadButtons({ previewId = 'ats-preview', resume }: D
       <button 
         onClick={handleWord}
         disabled={disabled}
-        className="flex items-center gap-1 border border-gray-700 px-3 py-1.5 text-sm bg-white text-black hover:bg-gray-50 disabled:opacity-50"
+        className="flex items-center gap-1 border border-gray-700 px-3 py-1.5 text-sm bg-white text-black hover:bg-gray-50 disabled:opacity-50 w-full sm:w-auto"
         title={!isResumeComplete(resume) ? 'Completa todas las secciones para habilitar la descarga' : ''}
       >
         <FileText size={14} />

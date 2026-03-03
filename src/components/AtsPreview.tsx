@@ -11,7 +11,7 @@ export default function AtsPreview() {
   const { basics, skills, experience, education, certifications, projects, languages } = resume;
 
   return (
-    <div className="font-sans bg-white text-black p-8 w-full max-w-2xl mx-auto text-sm">
+    <div className="font-sans bg-white text-black p-2 sm:p-6 md:p-8 w-full max-w-2xl mx-auto text-sm">
       <h1 className="text-2xl font-bold mb-1">{basics.name}</h1>
       <div className="mb-2 text-xs text-gray-700">
         {basics.email} {basics.phone && <>| {basics.phone}</>} {basics.linkedin && <>| {basics.linkedin}</>}<br />
@@ -22,9 +22,9 @@ export default function AtsPreview() {
       {skills && skills.length > 0 && (
         <section className="mb-4">
           <h2 className="text-base font-bold border-b border-gray-100 mb-1">Skills</h2>
-          <ul className="flex flex-wrap gap-2 list-none p-0 m-0">
+          <ul className="flex flex-wrap gap-1 sm:gap-2 list-none p-0 m-0">
             {skills.flatMap(s => s.keywords).map((kw, i) => (
-              <li key={i} className="text-xs px-2 py-1 bg-gray-100 rounded-none border border-gray-100 text-black">{kw}</li>
+              <li key={i} className="text-xs px-1.5 py-1 sm:px-2 bg-gray-100 rounded-none border border-gray-100 text-black">{kw}</li>
             ))}
           </ul>
         </section>
@@ -35,7 +35,7 @@ export default function AtsPreview() {
           <h2 className="text-base font-bold border-b border-gray-100 mb-1">Experience</h2>
           {experience.map((exp, i) => (
             <div key={i} className="mb-2">
-              <div className="flex flex-wrap gap-2 font-semibold">
+              <div className="flex flex-wrap gap-1 sm:gap-2 font-semibold">
                 <span>{exp.position}</span>
                 <span className="font-normal">@ {exp.company}</span>
                 {exp.location && <span className="text-xs">({exp.location})</span>}
@@ -100,9 +100,9 @@ export default function AtsPreview() {
       {languages && languages.length > 0 && (
         <section className="mb-4">
           <h2 className="text-base font-bold border-b border-gray-100 mb-1">Languages</h2>
-          <ul className="flex flex-wrap gap-2 list-none p-0 m-0">
+          <ul className="flex flex-wrap gap-1 sm:gap-2 list-none p-0 m-0">
             {languages.map((l, i) => (
-              <li key={i} className="text-xs px-2 py-1 bg-gray-100 border border-gray-100 text-black">{l.name} ({l.fluency})</li>
+              <li key={i} className="text-xs px-1.5 py-1 sm:px-2 bg-gray-100 border border-gray-100 text-black">{l.name} ({l.fluency})</li>
             ))}
           </ul>
         </section>
