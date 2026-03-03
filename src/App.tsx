@@ -53,7 +53,7 @@ export default function App() {
                     ? 'bg-black text-white md:bg-black md:text-white md:shadow-lg md:scale-105 md:border md:border-black md:rounded-xl'
                     : 'bg-white text-gray-900 md:bg-white md:text-black md:hover:bg-gray-100 md:hover:text-black'}
                 `}
-                style={{marginBottom: 0}}
+                style={{ marginBottom: 0 }}
                 onClick={() => setTab(t.key)}
               >
                 {t.label}
@@ -91,7 +91,15 @@ export default function App() {
       </div>
       <footer className="w-full bg-black text-white py-3 mt-5">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="italic text-xs sm:text-sm text-gray-200">Powered by Copilot &amp; IGNJS. Not much, but it may help someone who needs it.</p>
+          <span>Powered by </span>
+          <a
+            href="https://github.com/ignjs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white font-medium underline underline-offset-2"
+            aria-label="ignjs GitHub profile">
+            ignjs            
+          </a>
         </div>
       </footer>
     </>
