@@ -11,6 +11,7 @@ interface ResumeStore {
 const initialResume: AtsResume = {
   basics: {
     name: '',
+    label: '', // Cargo al que postula
     email: '',
     location: '',
     summary: '',
