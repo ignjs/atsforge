@@ -3,18 +3,53 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useResumeStore } from '../stores/resumeStore';
 import type { AtsResume } from '../types/index.ts';
 import { Plus, Trash2, CheckCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function FormCertifications() {
     const { resume, updateSection } = useResumeStore();
-    const { control, register, handleSubmit, formState: { isDirty, errors } } = useForm<{ certifications: AtsResume['certifications'] }>({
+    const { control, register, handleSubmit, watch, formState: { isDirty, errors } } = useForm<{ certifications: AtsResume['certifications'] }>({
         defaultValues: { certifications: resume.certifications || [] },
         mode: 'onBlur',
     });
+    // refs y estado para focus reactivo
+    const [dateErrorIdx, setDateErrorIdx] = useState<number | null>(null);
+
+    // Memorizar fechas para dependencias
+    const today = useRef(new Date());
+    today.current.setHours(0,0,0,0);
+    const minStart = useRef(new Date(today.current));
+    minStart.current.setFullYear(today.current.getFullYear() - 10);
+
+    // Validación robusta para string | undefined
+    const validateDate = (value: string | undefined) => {
+        if (!value) return 'Fecha requerida';
+        if (new Date(value) > today.current) return 'No puede ser futura';
+        if (new Date(value) < minStart.current) return 'Máximo 10 años atrás';
+        return true;
+    };
+
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'certifications',
     });
+
+    useEffect(() => {
+        if (dateErrorIdx !== null) {
+            const input = document.querySelector<HTMLInputElement>(`input[type="date"][data-idx='${dateErrorIdx}']`);
+            if (input) input.focus();
+        }
+    }, [dateErrorIdx]);
+
+    useEffect(() => {
+        const idx = fields.findIndex((_, i) => {
+            const date = watch(`certifications.${i}.date`) as string | undefined;
+            if (date && (new Date(date) > today.current || new Date(date) < minStart.current)) return true;
+            return false;
+        });
+        setDateErrorIdx(idx !== -1 ? idx : null);
+    }, [fields, watch, today, minStart]);
+
+    const hasDateError = dateErrorIdx !== null;
     const [saved, setSaved] = useState(false);
 
     const onSubmit = (data: { certifications: AtsResume['certifications'] }) => {
@@ -49,7 +84,17 @@ export default function FormCertifications() {
                         </label>
                         <label className="flex flex-col gap-1 text-sm">
                             <span className="font-semibold">Fecha *</span>
-                              <input type="date" className="border border-gray-700 bg-white px-3 py-2 rounded text-base" {...register(`certifications.${idx}.date`, { required: true })} />
+                            <input
+                                type="date"
+                                data-idx={idx}
+                                className={`border px-3 py-2 rounded text-base border-gray-700 bg-white`}
+                                {...register(`certifications.${idx}.date`, {
+                                    validate: validateDate
+                                })}
+                            />
+                            {errors?.certifications?.[idx]?.date && (
+                                <span className="text-xs text-red-600 mt-1">{errors.certifications[idx].date.message}</span>
+                            )}
                         </label>
                         <label className="flex flex-col gap-1 text-sm">
                             <span className="font-semibold">URL</span>
@@ -78,7 +123,7 @@ export default function FormCertifications() {
             </div>
             <div className="flex items-center gap-3 mt-2">
                 <button type="button" onClick={() => append({ name: '', issuer: '', date: '' })} className="flex items-center gap-1 text-sm text-black border border-gray-700 px-3 py-2 rounded bg-white"><Plus size={16} />Añadir certificación</button>
-                <button type="submit" className="bg-black text-white px-6 py-2 rounded text-sm font-semibold disabled:opacity-60" disabled={!isDirty && progress !== 100}>Guardar</button>
+                <button type="submit" className="bg-black text-white px-6 py-2 rounded text-sm font-semibold disabled:opacity-60" disabled={!isDirty && progress !== 100 || hasDateError}>Guardar</button>
                 {saved && <span className="text-xs text-green-700">¡Guardado!</span>}
             </div>
         </form>

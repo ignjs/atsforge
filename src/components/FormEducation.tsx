@@ -3,11 +3,11 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useResumeStore } from '../stores/resumeStore';
 import type { AtsResume } from '../types/index.ts';
 import { Plus, Trash2, CheckCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function FormEducation() {
     const { resume, updateSection } = useResumeStore();
-    const { control, register, handleSubmit, formState: { isDirty } } = useForm<{ education: AtsResume['education'] }>({
+    const { control, register, handleSubmit, watch, formState: { isDirty, errors } } = useForm<{ education: AtsResume['education'] }>({
         defaultValues: { education: resume.education },
         mode: 'onBlur',
     });
@@ -26,6 +26,54 @@ export default function FormEducation() {
     // Progress: at least one education with degree, institution, startDate
     const validEd = resume.education.filter(e => e.degree && e.institution && e.startDate);
     const progress = validEd.length > 0 ? 100 : 0;
+
+    // refs y estado para focus reactivo
+    const endDateRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const [dateErrorIdx, setDateErrorIdx] = useState<number | null>(null);
+
+    // Memorizar fechas para dependencias
+    const today = useRef(new Date());
+    today.current.setHours(0,0,0,0);
+    const minStart = useRef(new Date(today.current));
+    minStart.current.setFullYear(today.current.getFullYear() - 10);
+
+    // Validación robusta para string | undefined
+    const validateDates = (value: string | undefined, idx: number, field: 'start' | 'end') => {
+        const start = watch(`education.${idx}.startDate`) as string | undefined;
+        const end = watch(`education.${idx}.endDate`) as string | undefined;
+        if (field === 'start') {
+            if (!value) return 'Fecha inicio requerida';
+            if (new Date(value) > today.current) return 'Fecha inicio no puede ser futura';
+            if (new Date(value) < minStart.current) return 'Máximo 10 años atrás';
+            if (end && value > end) return 'Inicio > Fin';
+        }
+        if (field === 'end') {
+            if (value && new Date(value) > today.current) return 'Fecha fin no puede ser futura';
+            if (start && value && value < start) return 'Fin < Inicio';
+        }
+        return true;
+    };
+
+    useEffect(() => {
+        if (dateErrorIdx !== null && endDateRefs.current[dateErrorIdx]) {
+            endDateRefs.current[dateErrorIdx]?.focus();
+        }
+    }, [dateErrorIdx]);
+
+    useEffect(() => {
+        const idx = fields.findIndex((_, i) => {
+            const start = watch(`education.${i}.startDate`) as string | undefined;
+            const end = watch(`education.${i}.endDate`) as string | undefined;
+            if (start && end && end < start) return true;
+            if (start && new Date(start) > today.current) return true;
+            if (start && new Date(start) < minStart.current) return true;
+            if (end && new Date(end) > today.current) return true;
+            return false;
+        });
+        setDateErrorIdx(idx !== -1 ? idx : null);
+    }, [fields, watch, today, minStart]);
+
+    const hasDateError = dateErrorIdx !== null;
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 p-4">
@@ -54,11 +102,30 @@ export default function FormEducation() {
                         <div className="flex gap-2">
                             <label className="flex flex-col gap-1 text-sm w-1/2">
                                 <span className="font-semibold">Inicio *</span>
-                                <input type="date" className="border border-gray-700 bg-white px-3 py-2 rounded text-base" {...register(`education.${idx}.startDate`, { required: true })} />
+                                <input
+                                    type="date"
+                                    className="border px-3 py-2 rounded text-base border-gray-700 bg-white"
+                                    {...register(`education.${idx}.startDate`, {
+                                        validate: value => validateDates(value, idx, 'start')
+                                    })}
+                                />
+                                {errors?.education?.[idx]?.startDate && (
+                                    <span className="text-xs text-red-600 mt-1">{errors.education[idx].startDate.message}</span>
+                                )}
                             </label>
                             <label className="flex flex-col gap-1 text-sm w-1/2">
                                 <span className="font-semibold">Fin</span>
-                                <input type="date" className="border border-gray-700 bg-white px-3 py-2 rounded text-base" {...register(`education.${idx}.endDate`)} />
+                                <input
+                                    type="date"
+                                    data-idx={idx}
+                                    className={`border px-3 py-2 rounded text-base border-gray-700 bg-white`}
+                                    {...register(`education.${idx}.endDate`, {
+                                        validate: value => validateDates(value, idx, 'end')
+                                    })}
+                                />
+                                {errors?.education?.[idx]?.endDate && (
+                                    <span className="text-xs text-red-600 mt-1">{errors.education[idx].endDate.message}</span>
+                                )}
                             </label>
                         </div>
                         <label className="flex flex-col gap-1 text-sm md:col-span-2">
@@ -75,7 +142,7 @@ export default function FormEducation() {
             </div>
             <div className="flex items-center gap-3 mt-2">
                 <button type="button" onClick={() => append({ degree: '', institution: '', startDate: '' })} className="flex items-center gap-1 text-sm text-black border border-gray-700 px-3 py-2 rounded bg-white"><Plus size={16} />Añadir educación</button>
-                <button type="submit" className="bg-black text-white px-6 py-2 rounded text-sm font-semibold disabled:opacity-60" disabled={!isDirty && progress !== 100}>Guardar</button>
+                <button type="submit" className="bg-black text-white px-6 py-2 rounded text-sm font-semibold disabled:opacity-60" disabled={!isDirty && progress !== 100 || hasDateError}>Guardar</button>
                 {saved && <span className="text-xs text-green-700">¡Guardado!</span>}
             </div>
         </form>
