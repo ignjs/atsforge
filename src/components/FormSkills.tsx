@@ -50,11 +50,7 @@ export default function FormSkills() {
                         </label>
                         <label className="flex flex-col gap-1 text-sm">
                             <span className="font-semibold">Nivel</span>
-                            <select className="border border-gray-700 bg-white px-3 py-2 rounded text-base" {...register(`skills.${idx}.level`)}>
-                                <option value="">Selecciona</option>
-                                <option value="Advanced">Advanced</option>
-                                <option value="Intermediate">Intermediate</option>
-                            </select>
+                            <input className="border border-gray-700 bg-white px-3 py-2 rounded text-base" placeholder="Ej: Advanced, Intermediate, Básico" {...register(`skills.${idx}.level`)} />
                         </label>
                         <label className="flex flex-col gap-1 text-sm md:col-span-2">
                             <span className="font-semibold">Palabras clave *</span>

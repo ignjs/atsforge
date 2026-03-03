@@ -58,16 +58,16 @@ export default function DownloadButtons({ previewId = 'ats-preview', resume }: D
 
     const canvas = await html2canvas(preview, { 
       backgroundColor: '#FFFFFF', 
-      scale: 2,
+      scale: 1.5, // Mejor resolución sin exceder tamaño
       useCORS: true 
     });
 
-    const imgData = canvas.toDataURL('image/png');
+    const imgData = canvas.toDataURL('image/jpeg', 0.92); // JPEG calidad óptima
     const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
     
     // ← CAMBIO CLAVE: setProperties ANTES de addImage
     pdf.setProperties({
-      title: `${resume.basics.name} - Software Architect`,  // Personaliza con cargo
+      title: `${resume.basics.name} - ${resume.basics.label}`,
       author: resume.basics.name,
       subject: `CV ATS - ${resume.basics.location}`,
       keywords: keywords,  // Skills del JD
@@ -83,13 +83,13 @@ export default function DownloadButtons({ previewId = 'ats-preview', resume }: D
     let heightLeft = pdfHeight;
     let position = 0;
 
-    pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
+    pdf.addImage(imgData, 'JPEG', 10, 10, pdfWidth, pdfHeight);
     heightLeft -= pageHeight;
 
     while (heightLeft >= 0) {
       position = heightLeft - pdfHeight;
       pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 10, position + 10, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, 'JPEG', 10, position + 10, pdfWidth, pdfHeight);
       heightLeft -= pageHeight;
     }
 

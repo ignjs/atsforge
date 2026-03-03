@@ -1,6 +1,7 @@
 export interface AtsResume {
   basics: {
     name: string;              // Nombre completo
+    label: string;             // Cargo al que postula
     email: string;             // Email profesional
     phone?: string;            // Teléfono
     linkedin?: string;         // URL LinkedIn

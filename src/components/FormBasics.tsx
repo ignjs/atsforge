@@ -20,7 +20,7 @@ export default function FormBasics() {
   };
 
   // Progress: count filled required fields
-  const requiredFields = ['name', 'email', 'location', 'summary'];
+  const requiredFields = ['name', 'label', 'email', 'location', 'summary'];
   const filled = requiredFields.filter(f => resume.basics[f as keyof AtsResume['basics']]);
   const progress = Math.round((filled.length / requiredFields.length) * 100);
 
@@ -38,6 +38,11 @@ export default function FormBasics() {
           <span className="font-semibold">Nombre completo *</span>
           <input className="border border-gray-700 bg-white px-3 py-2 rounded text-base" {...register('name', { required: true })} placeholder="Ej: Juan Pérez" />
           {errors.name && <span className="text-xs text-gray-700">Requerido</span>}
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-semibold">Cargo al que postulas *</span>
+          <input className="border border-gray-700 bg-white px-3 py-2 rounded text-base" {...register('label', { required: true })} placeholder="Ej: Software Architect" />
+          {errors.label && <span className="text-xs text-gray-700">Requerido</span>}
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-semibold">Email profesional *</span>

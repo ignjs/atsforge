@@ -35,7 +35,7 @@ export default function FormEducation() {
     const today = useRef(new Date());
     today.current.setHours(0,0,0,0);
     const minStart = useRef(new Date(today.current));
-    minStart.current.setFullYear(today.current.getFullYear() - 10);
+    minStart.current.setFullYear(today.current.getFullYear() - 30);
 
     // Validación robusta para string | undefined
     const validateDates = (value: string | undefined, idx: number, field: 'start' | 'end') => {
